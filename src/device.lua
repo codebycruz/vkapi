@@ -145,6 +145,7 @@ return function(vk)
 	---@field depthTestEnable boolean?
 	---@field depthWriteEnable boolean?
 	---@field depthCompareOp vk.CompareOp?
+	---@field depthBoundsTestEnable boolean?
 
 	---@class vk.PipelineColorBlendAttachmentState
 	---@field blendEnable boolean?
@@ -277,6 +278,7 @@ return function(vk)
 			if info.depthStencilState then
 				local ds = info.depthStencilState ---@cast ds -nil
 				depthStencilState = vk.PipelineDepthStencilStateCreateInfo({
+					depthBoundsTestEnable = ds.depthBoundsTestEnable and 1 or 0,
 					depthTestEnable = ds.depthTestEnable and 1 or 0,
 					depthWriteEnable = ds.depthWriteEnable and 1 or 0,
 					depthCompareOp = ds.depthCompareOp or 0,
@@ -720,6 +722,12 @@ return function(vk)
 		return pool[0]
 	end
 
+	---@param pool vk.ffi.DescriptorPool
+	---@param allocator ffi.cdata*?
+	function VKDevice:destroyDescriptorPool(pool, allocator)
+		self.v1_0.vkDestroyDescriptorPool(self.handle, pool, allocator)
+	end
+
 	---@param info vk.ffi.DescriptorSetAllocateInfo
 	---@return vk.ffi.DescriptorSet[]
 	function VKDevice:allocateDescriptorSets(info)
@@ -1117,6 +1125,22 @@ return function(vk)
 	---@field vkCmdPipelineBarrier fun(commandBuffer: vk.ffi.CommandBuffer, srcStageMask: number, dstStageMask: number, dependencyFlags: number, memoryBarrierCount: number, pMemoryBarriers: ffi.cdata*?, bufferMemoryBarrierCount: number, pBufferMemoryBarriers: ffi.cdata*?, imageMemoryBarrierCount: number, pImageMemoryBarriers: ffi.cdata*?)
 	---@field vkCreateComputePipelines fun(device: vk.ffi.Device, pipelineCache: number, count: number, infos: ffi.cdata*, allocator: ffi.cdata*?, pipelines: ffi.cdata*): vk.ffi.Result
 	---@field vkCmdDispatch fun(commandBuffer: vk.ffi.CommandBuffer, groupCountX: number, groupCountY: number, groupCountZ: number)
+	---@field vkDestroyImage fun(device: vk.ffi.Device, image: vk.ffi.Image, allocator: ffi.cdata*?)
+	---@field vkDestroyPipeline fun(device: vk.ffi.Device, pipeline: vk.ffi.Pipeline, allocator: ffi.cdata*?)
+	---@field vkDestroyPipelineLayout fun(device: vk.ffi.Device, pipelineLayout: vk.ffi.PipelineLayout, allocator: ffi.cdata*?)
+	---@field vkDestroyRenderPass fun(device: vk.ffi.Device, renderPass: vk.ffi.RenderPass, allocator: ffi.cdata*?)
+	---@field vkDestroyImageView fun(device: vk.ffi.Device, imageView: vk.ffi.ImageView, allocator: ffi.cdata*?)
+	---@field vkDestroyFramebuffer fun(device: vk.ffi.Device, framebuffer: vk.ffi.Framebuffer, allocator: ffi.cdata*?)
+	---@field vkDestroyDescriptorSetLayout fun(device: vk.ffi.Device, layout: vk.ffi.DescriptorSetLayout, allocator: ffi.cdata*?)
+	---@field vkDestroyCommandPool fun(device: vk.ffi.Device, commandPool: vk.ffi.CommandPool, allocator: ffi.cdata*?)
+	---@field vkDestroyShaderModule fun(device: vk.ffi.Device, shaderModule: vk.ffi.ShaderModule, allocator: ffi.cdata*?)
+	---@field vkDestroyBuffer fun(device: vk.ffi.Device, buffer: vk.ffi.Buffer, allocator: ffi.cdata*?)
+	---@field vkFreeMemory fun(device: vk.ffi.Device, memory: vk.ffi.DeviceMemory, allocator: ffi.cdata*?)
+	---@field vkDestroySemaphore fun(device: vk.ffi.Device, semaphore: vk.ffi.Semaphore, allocator: ffi.cdata*?)
+	---@field vkDestroyFence fun(device: vk.ffi.Device, fence: vk.ffi.Fence, allocator: ffi.cdata*?)
+	---@field vkDestroySwapchainKHR fun(device: vk.ffi.Device, swapchain: vk.ffi.SwapchainKHR, allocator: ffi.cdata*?)
+	---@field vkDestroyDescriptorPool fun(device: vk.ffi.Device, pool: vk.ffi.DescriptorPool, allocator: ffi.cdata*?)
+	---@field vkResetCommandPool fun(device: vk.ffi.Device, commandPool: vk.ffi.CommandPool, flags: number): vk.ffi.Result
 
 	---@param handle vk.ffi.Device
 	function VKDevice.new(handle)
@@ -1171,11 +1195,18 @@ return function(vk)
 			vkQueuePresentKHR = "VkResult(*)(VkQueue, const VkPresentInfoKHR*)",
 			vkCreateSampler = "VkResult(*)(VkDevice, const VkSamplerCreateInfo*, const VkAllocationCallbacks*, VkSampler*)",
 			vkDestroySampler = "void(*)(VkDevice, VkSampler, const VkAllocationCallbacks*)",
+			vkDestroyDescriptorPool = "void(*)(VkDevice, VkDescriptorPool, const VkAllocationCallbacks*)",
 			vkDestroyImageView = "void(*)(VkDevice, VkImageView, const VkAllocationCallbacks*)",
 			vkDestroyFramebuffer = "void(*)(VkDevice, VkFramebuffer, const VkAllocationCallbacks*)",
 			vkDestroyCommandPool = "void(*)(VkDevice, VkCommandPool, const VkAllocationCallbacks*)",
 			vkDestroyShaderModule = "void(*)(VkDevice, VkShaderModule, const VkAllocationCallbacks*)",
 			vkDestroyFence = "void(*)(VkDevice, VkFence, const VkAllocationCallbacks*)",
+			vkDestroySemaphore = "void(*)(VkDevice, VkSemaphore, const VkAllocationCallbacks*)",
+			vkDestroySwapchainKHR = "void(*)(VkDevice, VkSwapchainKHR, const VkAllocationCallbacks*)",
+			vkDestroyBuffer = "void(*)(VkDevice, VkBuffer, const VkAllocationCallbacks*)",
+			vkDestroyImage = "void(*)(VkDevice, VkImage, const VkAllocationCallbacks*)",
+			vkDestroyPipeline = "void(*)(VkDevice, VkPipeline, const VkAllocationCallbacks*)",
+			vkDestroyPipelineLayout = "void(*)(VkDevice, VkPipelineLayout, const VkAllocationCallbacks*)",
 			vkFreeMemory = "void(*)(VkDevice, VkDeviceMemory, const VkAllocationCallbacks*)",
 			vkResetCommandPool = "VkResult(*)(VkDevice, VkCommandPool, VkFlags)",
 			vkCmdPipelineBarrier = "void(*)(VkCommandBuffer, VkFlags, VkFlags, VkFlags, uint32_t, const void*, uint32_t, const void*, uint32_t, const VkImageMemoryBarrier*)",
