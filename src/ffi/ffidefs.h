@@ -21,6 +21,7 @@ typedef uint32_t VkPhysicalDeviceType;
 typedef void *VkBuffer;
 typedef VkFlags VkBufferCreateFlags;
 typedef VkFlags VkBufferUsageFlags;
+typedef VkFlags VkPipelineStageFlags;
 typedef uint32_t VkSharingMode;
 typedef void VkAllocationCallbacks;
 typedef VkFlags VkShaderModuleCreateFlags;
@@ -883,7 +884,7 @@ typedef struct {
   const void *pNext;
   uint32_t waitSemaphoreCount;
   const VkSemaphore *pWaitSemaphores;
-  const void *pWaitDstStageMask;
+  const VkPipelineStageFlags *pWaitDstStageMask;
   uint32_t commandBufferCount;
   const VkCommandBuffer *pCommandBuffers;
   uint32_t signalSemaphoreCount;
