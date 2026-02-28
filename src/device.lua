@@ -154,7 +154,7 @@ return function(vk)
 	---@field srcAlphaBlendFactor vk.BlendFactor?
 	---@field dstAlphaBlendFactor vk.BlendFactor?
 	---@field alphaBlendOp vk.BlendOp?
-	---@field colorWriteMask vk.ColorComponentFlags?
+	---@field colorWriteMask vk.ColorComponentFlagBits?
 
 	---@class vk.PipelineColorBlendStateCreateInfo
 	---@field logicOpEnable boolean?

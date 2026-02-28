@@ -155,6 +155,17 @@ vk.CullModeFlagBits = {
 	FRONT_AND_BACK = 0x00000003,
 }
 
+---@enum vk.ComponentSwizzle
+vk.ComponentSwizzle = {
+	IDENTITY = 0,
+	ZERO = 1,
+	ONE = 2,
+	R = 3,
+	G = 4,
+	B = 5,
+	A = 6,
+}
+
 ---@enum vk.FrontFace
 vk.FrontFace = {
 	COUNTER_CLOCKWISE = 0,
@@ -228,8 +239,8 @@ vk.BlendOp = {
 	MAX = 4,
 }
 
----@enum vk.ColorComponentFlags
-vk.ColorComponentFlags = {
+---@enum vk.ColorComponentFlagBits
+vk.ColorComponentFlagBits = {
 	R = 0x00000001,
 	G = 0x00000002,
 	B = 0x00000004,
