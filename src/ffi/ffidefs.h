@@ -875,7 +875,7 @@ typedef struct {
   VkFramebuffer framebuffer;
   VkRect2D renderArea;
   uint32_t clearValueCount;
-  const void *pClearValues;
+  const VkClearValue *pClearValues;
 } VkRenderPassBeginInfo;
 
 typedef struct {
