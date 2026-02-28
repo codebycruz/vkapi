@@ -25,3 +25,5 @@ A few examples might give you the gist:
 `VkCreateInstance` -> `vk.createInstance`  
 `VkCreateBuffer` -> `VkDevice:createBuffer`  
 `VkQueueFlagBits(VK_QUEUE_GRAPHICS_BIT)` -> `vk.QueueFlagBits.GRAPHICS`
+
+Of course it is 2026 so this is entirely typed with LuaLS annotations.
