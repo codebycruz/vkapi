@@ -936,22 +936,11 @@ return function(vk)
 	end
 
 	---@param queue vk.ffi.Queue
+	---@param count number
 	---@param submits vk.ffi.SubmitInfo[]
 	---@param fence number?
-	function VKDevice:queueSubmit(queue, submits, fence)
-		local count = #submits
-		local submitArray = vk.SubmitInfoArray(count)
-		for i = 1, count do
-			local s = submits[i]
-			submitArray[i - 1].waitSemaphoreCount = s.waitSemaphoreCount or 0
-			submitArray[i - 1].pWaitSemaphores = s.pWaitSemaphores
-			submitArray[i - 1].pWaitDstStageMask = s.pWaitDstStageMask
-			submitArray[i - 1].commandBufferCount = s.commandBufferCount or 0
-			submitArray[i - 1].pCommandBuffers = s.pCommandBuffers
-			submitArray[i - 1].signalSemaphoreCount = s.signalSemaphoreCount or 0
-			submitArray[i - 1].pSignalSemaphores = s.pSignalSemaphores
-		end
-		local result = self.v1_0.vkQueueSubmit(queue, count, submitArray, fence or 0)
+	function VKDevice:queueSubmit(queue, count, submits, fence)
+		local result = self.v1_0.vkQueueSubmit(queue, count, submits, fence or 0)
 		if result ~= 0 then
 			error("Failed to submit to Vulkan queue, error code: " .. tostring(result))
 		end
