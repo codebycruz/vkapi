@@ -3,7 +3,7 @@ local winit = require("winit")
 local ffi = require("ffi")
 
 local instance = vk.createInstance({
-	enabledExtensionNames = { "VK_KHR_surface", "VK_KHR_xlib_surface" },
+	enabledExtensionNames = { "VK_KHR_surface", ffi.os == "Linux" and "VK_KHR_xlib_surface" or "VK_KHR_win32_surface" },
 	enabledLayerNames = { "VK_LAYER_KHRONOS_validation" },
 	applicationInfo = {
 		name = "triangle test",
