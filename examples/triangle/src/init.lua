@@ -213,6 +213,18 @@ do
 	})
 
 	device:bindBufferMemory(vertexBuffer, memoryChunk, 0)
+
+	local data = ffi.cast("float*", device:mapMemory(memoryChunk, 0, memoryRequirements.size))
+	-- vertex 0: top center, red
+	data[0] = 0.0; data[1] = -0.5; data[2] = 0.0
+	data[3] = 1.0; data[4] = 0.0; data[5] = 0.0; data[6] = 1.0
+	-- vertex 1: bottom right, green
+	data[7] = 0.5; data[8] = 0.5; data[9] = 0.0
+	data[10] = 0.0; data[11] = 1.0; data[12] = 0.0; data[13] = 1.0
+	-- vertex 2: bottom left, blue
+	data[14] = -0.5; data[15] = 0.5; data[16] = 0.0
+	data[17] = 0.0; data[18] = 0.0; data[19] = 1.0; data[20] = 1.0
+	device:unmapMemory(memoryChunk)
 end
 
 local indexBuffer = device:createBuffer({
@@ -243,6 +255,10 @@ do
 	})
 
 	device:bindBufferMemory(indexBuffer, memoryChunk, 0)
+
+	local indices = ffi.cast("uint16_t*", device:mapMemory(memoryChunk, 0, memoryRequirements.size))
+	indices[0] = 0; indices[1] = 1; indices[2] = 2
+	device:unmapMemory(memoryChunk)
 end
 
 local pipeline = device:createGraphicsPipelines(nil, { {
@@ -352,7 +368,7 @@ renderPassBeginInfo.renderArea = {
 }
 renderPassBeginInfo.clearValueCount = 1
 renderPassBeginInfo.pClearValues = vk.ClearValueArray(1)
-renderPassBeginInfo.pClearValues[0].color.float32[0] = 1.0
+renderPassBeginInfo.pClearValues[0].color.float32[0] = 0.0
 renderPassBeginInfo.pClearValues[0].color.float32[1] = 0.0
 renderPassBeginInfo.pClearValues[0].color.float32[2] = 0.0
 renderPassBeginInfo.pClearValues[0].color.float32[3] = 1.0
