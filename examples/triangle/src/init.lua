@@ -168,9 +168,12 @@ local commandBuffer = device:allocateCommandBuffers({
 
 local pipelineLayout = device:createPipelineLayout({})
 
+local targetFolder = debug.getinfo(1, "S").source:sub(2):match("(.*/)") or "./"
+local projectFolder = targetFolder .. "../../"
+
 local vertexModule ---@type vk.ffi.ShaderModule
 do
-	local code = io.open("shaders/triangle.vert.spv", "rb"):read("*a")
+	local code = io.open(projectFolder .. "shaders/triangle.vert.spv", "rb"):read("*a")
 	vertexModule = device:createShaderModule({
 		codeSize = #code,
 		pCode = ffi.cast("const uint32_t*", code),
@@ -179,7 +182,7 @@ end
 
 local fragmentModule ---@type vk.ffi.ShaderModule
 do
-	local code = io.open("shaders/triangle.frag.spv", "rb"):read("*a")
+	local code = io.open(projectFolder .. "shaders/triangle.frag.spv", "rb"):read("*a")
 	fragmentModule = device:createShaderModule({
 		codeSize = #code,
 		pCode = ffi.cast("const uint32_t*", code),
