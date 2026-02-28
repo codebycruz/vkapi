@@ -18,7 +18,7 @@ typedef uint32_t VkBool32;
 typedef VkFlags VkSampleCountFlags;
 typedef uint64_t VkDeviceSize;
 typedef uint32_t VkPhysicalDeviceType;
-typedef uint64_t VkBuffer;
+typedef void *VkBuffer;
 typedef VkFlags VkBufferCreateFlags;
 typedef VkFlags VkBufferUsageFlags;
 typedef uint32_t VkSharingMode;

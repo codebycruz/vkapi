@@ -84,6 +84,9 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field SwapchainKHRArray fun(count: number): vk.ffi.SwapchainKHR[]
 ---@field SemaphoreArray fun(count: number): vk.ffi.Semaphore[]
 ---@field FenceArray fun(count: number): vk.ffi.Fence[]
+---@field BufferArray fun(count: number): vk.ffi.Buffer[]
+---@field DeviceSizeArray fun(count: number): vk.ffi.DeviceSize[]
+---@field MemoryRequirementsArray fun(count: number): vk.ffi.MemoryRequirements[]
 local vk = {}
 for k, v in pairs(vkEnums) do
 	vk[k] = v
@@ -191,6 +194,8 @@ do
 	defType("SwapchainKHR")
 	defType("Semaphore")
 	defType("Fence")
+	defType("Buffer")
+	defType("DeviceSize")
 end
 
 -- Constants

@@ -13,7 +13,7 @@ return function(vk)
 	---@return vk.ffi.Buffer
 	function VKDevice:createBuffer(info, allocator)
 		local createInfo = vk.BufferCreateInfo(info)
-		local buffer = ffi.new("VkBuffer[1]")
+		local buffer = vk.BufferArray(1)
 		local result = self.v1_0.vkCreateBuffer(self.handle, createInfo, allocator, buffer)
 		if result ~= 0 then
 			error("Failed to create Vulkan buffer, error code: " .. tostring(result))
@@ -552,9 +552,9 @@ return function(vk)
 	---@param buffer vk.ffi.Buffer
 	---@return vk.ffi.MemoryRequirements
 	function VKDevice:getBufferMemoryRequirements(buffer)
-		local memRequirements = vk.MemoryRequirements()
+		local memRequirements = vk.MemoryRequirementsArray(1)
 		self.v1_0.vkGetBufferMemoryRequirements(self.handle, buffer, memRequirements)
-		return memRequirements
+		return memRequirements[0]
 	end
 
 	---@param image vk.ffi.Image

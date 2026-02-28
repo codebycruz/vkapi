@@ -94,8 +94,8 @@ vk.MemoryPropertyFlagBits = {
 	LAZILY_ALLOCATED = 0x00000010,
 }
 
----@enum vk.BufferUsage
-vk.BufferUsage = {
+---@enum vk.BufferUsageFlagBits
+vk.BufferUsageFlagBits = {
 	TRANSFER_SRC = 0x00000001,
 	TRANSFER_DST = 0x00000002,
 	UNIFORM_TEXEL_BUFFER = 0x00000004,

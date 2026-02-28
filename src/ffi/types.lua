@@ -129,7 +129,7 @@
 
 ---@class vk.ffi.BufferCreateInfo: vk.ffi.BaseStruct
 ---@field size number
----@field usage vk.BufferUsage
+---@field usage vk.BufferUsageFlagBits
 ---@field sharingMode vk.SharingMode?
 ---@field queueFamilyIndexCount number?
 ---@field pQueueFamilyIndices ffi.cdata*?
