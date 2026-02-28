@@ -394,8 +394,8 @@ return function(vk)
 	---@class vk.SubpassDependency
 	---@field srcSubpass number
 	---@field dstSubpass number
-	---@field srcStageMask vk.PipelineStageFlags
-	---@field dstStageMask vk.PipelineStageFlags
+	---@field srcStageMask vk.PipelineStageFlagBits
+	---@field dstStageMask vk.PipelineStageFlagBits
 	---@field srcAccessMask vk.AccessFlags?
 	---@field dstAccessMask vk.AccessFlags?
 	---@field dependencyFlags number?
@@ -850,8 +850,8 @@ return function(vk)
 	end
 
 	---@param commandBuffer vk.ffi.CommandBuffer
-	---@param srcStageMask vk.PipelineStageFlags
-	---@param dstStageMask vk.PipelineStageFlags
+	---@param srcStageMask vk.PipelineStageFlagBits
+	---@param dstStageMask vk.PipelineStageFlagBits
 	---@param imageMemoryBarrierCount number
 	---@param pImageMemoryBarriers ffi.cdata*?
 	---@param memoryBarrierCount number?

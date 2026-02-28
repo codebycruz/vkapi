@@ -85,8 +85,8 @@ vk.ImageUsageFlagBits = {
 	INPUT_ATTACHMENT = 0x00000080,
 }
 
----@enum vk.MemoryPropertyFlags
-vk.MemoryPropertyFlags = {
+---@enum vk.MemoryPropertyFlagBits
+vk.MemoryPropertyFlagBits = {
 	DEVICE_LOCAL = 0x00000001,
 	HOST_VISIBLE = 0x00000002,
 	HOST_COHERENT = 0x00000004,
@@ -293,8 +293,8 @@ vk.AttachmentStoreOp = {
 	DONT_CARE = 1,
 }
 
----@enum vk.PipelineStageFlags
-vk.PipelineStageFlags = {
+---@enum vk.PipelineStageFlagBits
+vk.PipelineStageFlagBits = {
 	TOP_OF_PIPE = 0x00000001,
 	DRAW_INDIRECT = 0x00000002,
 	VERTEX_INPUT = 0x00000004,

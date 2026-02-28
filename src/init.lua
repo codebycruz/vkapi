@@ -81,6 +81,9 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field ImageViewArray fun(count: number): vk.ffi.ImageView[]
 ---@field ViewportArray fun(count: number): vk.ffi.Viewport[]
 ---@field Rect2DArray fun(count: number): vk.ffi.Rect2D[]
+---@field SwapchainKHRArray fun(count: number): vk.ffi.SwapchainKHR[]
+---@field SemaphoreArray fun(count: number): vk.ffi.Semaphore[]
+---@field FenceArray fun(count: number): vk.ffi.Fence[]
 local vk = {}
 for k, v in pairs(vkEnums) do
 	vk[k] = v
@@ -185,6 +188,9 @@ do
 	defType("BufferImageCopy")
 	defType("CommandBuffer")
 	defType("ImageView")
+	defType("SwapchainKHR")
+	defType("Semaphore")
+	defType("Fence")
 end
 
 -- Constants

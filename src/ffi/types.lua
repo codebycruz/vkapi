@@ -314,8 +314,8 @@
 ---@class vk.ffi.SubpassDependency: ffi.cdata*
 ---@field srcSubpass number
 ---@field dstSubpass number
----@field srcStageMask vk.PipelineStageFlags
----@field dstStageMask vk.PipelineStageFlags
+---@field srcStageMask vk.PipelineStageFlagBits
+---@field dstStageMask vk.PipelineStageFlagBits
 ---@field srcAccessMask vk.AccessFlags
 ---@field dstAccessMask vk.AccessFlags
 ---@field dependencyFlags number
