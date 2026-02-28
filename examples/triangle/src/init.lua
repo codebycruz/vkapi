@@ -2,6 +2,8 @@ local vk = require("vkapi")
 local winit = require("winit")
 local ffi = require("ffi")
 
+local desiredFormat = vk.Format.B8G8R8A8_SRGB
+
 local instance = vk.createInstance({
 	enabledExtensionNames = { "VK_KHR_surface", ffi.os == "Linux" and "VK_KHR_xlib_surface" or "VK_KHR_win32_surface" },
 	enabledLayerNames = { "VK_LAYER_KHRONOS_validation" },
@@ -76,7 +78,7 @@ local queue = device:getDeviceQueue(queueFamilyIdx, 0)
 local renderPass = device:createRenderPass({
 	attachments = {
 		{
-			format = vk.Format.B8G8R8A8_UNORM,
+			format = desiredFormat,
 			samples = vk.SampleCountFlagBits.COUNT_1,
 			loadOp = vk.AttachmentLoadOp.CLEAR,
 			storeOp = vk.AttachmentStoreOp.STORE,
@@ -101,7 +103,7 @@ local renderPass = device:createRenderPass({
 local swapchain = device:createSwapchainKHR({
 	surface = surface,
 	minImageCount = 2,
-	imageFormat = vk.Format.B8G8R8A8_UNORM,
+	imageFormat = desiredFormat,
 	imageColorSpace = vk.ColorSpaceKHR.SRGB_NONLINEAR,
 	imageExtent = { width = window.width, height = window.height },
 	imageArrayLayers = 1,
@@ -123,7 +125,7 @@ for i, image in ipairs(swapchainImages) do
 	local imageView = device:createImageView({
 		image = image,
 		viewType = vk.ImageViewType.TYPE_2D,
-		format = vk.Format.B8G8R8A8_UNORM,
+		format = desiredFormat,
 		subresourceRange = {
 			aspectMask = vk.ImageAspectFlagBits.COLOR,
 			baseMipLevel = 0,
