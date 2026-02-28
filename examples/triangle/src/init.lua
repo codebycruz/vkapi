@@ -2,6 +2,16 @@ local vk = require("vkapi")
 local winit = require("winit")
 local ffi = require("ffi")
 
+ffi.cdef [[
+	typedef struct { long tv_sec; long tv_nsec; } timespec_t;
+	int clock_gettime(int, timespec_t*);
+]]
+local _ts = ffi.new("timespec_t")
+local function now()
+	ffi.C.clock_gettime(1, _ts) -- CLOCK_MONOTONIC = 1
+	return tonumber(_ts.tv_sec) + tonumber(_ts.tv_nsec) * 1e-9
+end
+
 local instance = vk.createInstance({
 	enabledExtensionNames = { "VK_KHR_surface", ffi.os == "Linux" and "VK_KHR_xlib_surface" or "VK_KHR_win32_surface" },
 	enabledLayerNames = { "VK_LAYER_KHRONOS_validation" },
@@ -73,10 +83,6 @@ end
 
 local queue = device:getDeviceQueue(queueFamilyIdx, 0)
 
-local commandPool = device:createCommandPool({
-	queueFamilyIndex = queueFamilyIdx,
-})
-
 local renderPass = device:createRenderPass({
 	attachments = {
 		{
@@ -113,7 +119,7 @@ local swapchain = device:createSwapchainKHR({
 	imageSharingMode = vk.SharingMode.EXCLUSIVE,
 	preTransform = vk.SurfaceTransformFlagBitsKHR.IDENTITY,
 	compositeAlpha = vk.CompositeAlphaFlagBitsKHR.OPAQUE,
-	presentMode = vk.PresentModeKHR.FIFO,
+	presentMode = vk.PresentModeKHR.IMMEDIATE,
 	clipped = 1,
 	oldSwapchain = nil,
 })
@@ -160,11 +166,19 @@ for i, image in ipairs(swapchainImages) do
 	framebuffers[i] = framebuffer
 end
 
-local commandBuffer = device:allocateCommandBuffers({
-	commandPool = commandPool,
-	level = vk.CommandBufferLevel.PRIMARY,
-	commandBufferCount = 1,
-})[1]
+local commandPools = {}
+local commandBuffers = {}
+for i = 1, #swapchainImages do
+	commandPools[i] = device:createCommandPool({
+		queueFamilyIndex = queueFamilyIdx,
+	})
+
+	commandBuffers[i] = device:allocateCommandBuffers({
+		commandPool = commandPools[i],
+		level = vk.CommandBufferLevel.PRIMARY,
+		commandBufferCount = 1,
+	})[1]
+end
 
 local pipelineLayout = device:createPipelineLayout({})
 
@@ -370,42 +384,53 @@ renderPassBeginInfo.renderArea = {
 	extent = { width = 800, height = 600 },
 }
 renderPassBeginInfo.clearValueCount = 1
-renderPassBeginInfo.pClearValues = vk.ClearValueArray(1)
+
+local clearValueArray = vk.ClearValueArray(1) -- pin: ensure memory isn't freed
+renderPassBeginInfo.pClearValues = clearValueArray
 renderPassBeginInfo.pClearValues[0].color.float32[0] = 0.0
 renderPassBeginInfo.pClearValues[0].color.float32[1] = 0.0
 renderPassBeginInfo.pClearValues[0].color.float32[2] = 0.0
 renderPassBeginInfo.pClearValues[0].color.float32[3] = 1.0
 
-local imageAvailableSemaphore = device:createSemaphore({})
-local renderFinishedSemaphore = device:createSemaphore({})
-local inFlightFence = device:createFence({ flags = vk.FenceCreateFlagBits.SIGNALED })
+local imageAvailableSemaphores = {}
+local renderFinishedSemaphores = {}
+local inFlightFences = {}
+for i = 1, #swapchainImages do
+	imageAvailableSemaphores[i] = device:createSemaphore({})
+	renderFinishedSemaphores[i] = device:createSemaphore({})
+	inFlightFences[i] = device:createFence({ flags = vk.FenceCreateFlagBits.SIGNALED })
+end
 
 local swapchains = vk.SwapchainKHRArray(1)
 swapchains[0] = swapchain
 
 local imageIndices = ffi.new("uint32_t[1]")
 
-local waitSemaphores = vk.SemaphoreArray(1)
-waitSemaphores[0] = imageAvailableSemaphore
+local waitSemaphoresLen = #swapchainImages
+local waitSemaphores = vk.SemaphoreArray(waitSemaphoresLen)
+for i = 1, waitSemaphoresLen do
+	waitSemaphores[i - 1] = imageAvailableSemaphores[i]
+end
 
-local signalSemaphores = vk.SemaphoreArray(1)
-signalSemaphores[0] = renderFinishedSemaphore
+local signalSemaphoresLen = #swapchainImages
+local signalSemaphores = vk.SemaphoreArray(signalSemaphoresLen)
+for i = 1, signalSemaphoresLen do
+	signalSemaphores[i - 1] = renderFinishedSemaphores[i]
+end
+
+local commandBuffersToSubmit = vk.CommandBufferArray(1)
+local waitDstStageMask = ffi.new("uint32_t[1]", vk.PipelineStageFlagBits.COLOR_ATTACHMENT_OUTPUT) -- pin: ensure memory isn't freed
 
 local queueSubmits = vk.SubmitInfoArray(1)
-do
-	local commandBuffers = vk.CommandBufferArray(1)
-	commandBuffers[0] = commandBuffer
-
-	queueSubmits[0] = vk.SubmitInfo({
-		waitSemaphoreCount = 1,
-		pWaitSemaphores = waitSemaphores,
-		pWaitDstStageMask = ffi.new("uint32_t[2]", vk.PipelineStageFlagBits.COLOR_ATTACHMENT_OUTPUT, 0),
-		commandBufferCount = 1,
-		pCommandBuffers = commandBuffers,
-		signalSemaphoreCount = 1,
-		pSignalSemaphores = signalSemaphores,
-	})
-end
+queueSubmits[0] = vk.SubmitInfo({
+	waitSemaphoreCount = waitSemaphoresLen,
+	pWaitSemaphores = waitSemaphores,
+	pWaitDstStageMask = waitDstStageMask,
+	commandBufferCount = 1,
+	pCommandBuffers = commandBuffersToSubmit,
+	signalSemaphoreCount = signalSemaphoresLen,
+	pSignalSemaphores = signalSemaphores,
+})
 
 local vertexBuffers = vk.BufferArray(1)
 vertexBuffers[0] = vertexBuffer
@@ -413,17 +438,40 @@ vertexBuffers[0] = vertexBuffer
 local vertexBufferOffsets = vk.DeviceSizeArray(1)
 vertexBufferOffsets[0] = 0
 
-local fences = vk.FenceArray(1)
-fences[0] = inFlightFence
+local fencesLen = #swapchainImages
+local fences = vk.FenceArray(fencesLen)
+for i = 1, fencesLen do
+	fences[i - 1] = inFlightFences[i]
+end
 
+local frameCount = 0
+local lastFpsTime = now()
+
+local currentFrame = 1
 local function draw()
-	-- Reuse previous command buffer for simplicity, but you'd want to double/triple buffer usually
-	device:resetCommandPool(commandPool)
+	local fence = inFlightFences[currentFrame]
+	local imgSemaphore = imageAvailableSemaphores[currentFrame]
+	local renderSemaphore = renderFinishedSemaphores[currentFrame]
 
-	device:waitForFences(1, fences, true, math.huge)
-	device:resetFences(1, fences)
+	local pool = commandPools[currentFrame]
+	local commandBuffer = commandBuffers[currentFrame]
 
-	local imageIndex = device:acquireNextImageKHR(swapchain, -1, imageAvailableSemaphore, nil)
+	local frameOffset = currentFrame - 1
+	currentFrame = currentFrame % fencesLen + 1
+
+	device:waitForFences(1, fences + frameOffset, true, math.huge)
+	device:resetFences(1, fences + frameOffset)
+	device:resetCommandPool(pool)
+
+	commandBuffersToSubmit[0] = commandBuffer
+
+	queueSubmits[0].waitSemaphoreCount = 1
+	queueSubmits[0].pWaitSemaphores = waitSemaphores + frameOffset
+
+	queueSubmits[0].signalSemaphoreCount = 1
+	queueSubmits[0].pSignalSemaphores = signalSemaphores + frameOffset
+
+	local imageIndex = device:acquireNextImageKHR(swapchain, -1, imgSemaphore, nil)
 	renderPassBeginInfo.framebuffer = framebuffers[imageIndex + 1]
 	imageIndices[0] = imageIndex
 
@@ -438,8 +486,17 @@ local function draw()
 	device:cmdEndRenderPass(commandBuffer)
 	device:endCommandBuffer(commandBuffer)
 
-	device:queueSubmit(queue, 1, queueSubmits, inFlightFence)
-	device:queuePresentKHR(queue, swapchain, imageIndex, renderFinishedSemaphore)
+	device:queueSubmit(queue, 1, queueSubmits, fence)
+	device:queuePresentKHR(queue, swapchain, imageIndex, renderSemaphore)
+
+	frameCount = frameCount + 1
+	local t = now()
+	local elapsed = t - lastFpsTime
+	if elapsed >= 1.0 then
+		print(string.format("\rFPS: %.1f", frameCount / elapsed))
+		frameCount = 0
+		lastFpsTime = t
+	end
 end
 
 eventLoop:run(function(event, handler)
@@ -447,5 +504,7 @@ eventLoop:run(function(event, handler)
 		draw()
 	elseif event.name == "windowClose" then
 		handler:exit()
+	elseif event.name == "aboutToWait" then
+		handler:requestRedraw(window)
 	end
 end)
