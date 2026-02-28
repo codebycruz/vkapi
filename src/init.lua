@@ -79,6 +79,8 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field SubmitInfoArray fun(count: number): vk.ffi.SubmitInfo[]
 ---@field CommandBufferArray fun(count: number): vk.ffi.CommandBuffer[]
 ---@field ImageViewArray fun(count: number): vk.ffi.ImageView[]
+---@field ViewportArray fun(count: number): vk.ffi.Viewport[]
+---@field Rect2DArray fun(count: number): vk.ffi.Rect2D[]
 local vk = {}
 for k, v in pairs(vkEnums) do
 	vk[k] = v
