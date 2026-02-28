@@ -18,6 +18,7 @@ return function(vk)
 	---@class vk.DeviceCreateInfo
 	---@field queueCreateInfos vk.DeviceQueueCreateInfo[]
 	---@field enabledExtensionNames vk.DeviceExtensionName[]
+	---@field enabledFeatures vk.ffi.PhysicalDeviceFeatures?
 
 	---@param physicalDevice vk.ffi.PhysicalDevice
 	---@param info vk.DeviceCreateInfo?
@@ -51,12 +52,17 @@ return function(vk)
 			end
 		end
 
+		local enabledFeatures = nil
+		if info.enabledFeatures then -- todo: support v2+ features
+			enabledFeatures = vk.PhysicalDeviceFeatures(info.enabledFeatures)
+		end
+
 		local deviceCreateInfo = vk.DeviceCreateInfo({
 			queueCreateInfoCount = queueCreateInfoCount,
 			pQueueCreateInfos = queueCreateInfos,
 			enabledExtensionCount = extensionCount,
 			ppEnabledExtensionNames = extensionNames,
-			-- The other stuff is legacy so leave it zeroed
+			pEnabledFeatures = enabledFeatures,
 		})
 
 		local result = self.v1_0.vkCreateDevice(physicalDevice, deviceCreateInfo, allocator, device)

@@ -69,6 +69,7 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field Viewport fun(init: vk.ffi.Viewport?): vk.ffi.Viewport
 ---@field Rect2D fun(init: vk.ffi.Rect2D?): vk.ffi.Rect2D
 ---@field BufferImageCopy fun(init: vk.ffi.BufferImageCopy?): vk.ffi.BufferImageCopy
+---@field PhysicalDeviceFeatures fun(init: vk.ffi.PhysicalDeviceFeatures?): vk.ffi.PhysicalDeviceFeatures
 ---@field ImageMemoryBarrierArray fun(count: number): vk.ffi.ImageMemoryBarrier[]
 ---@field ClearValueArray fun(count: number): vk.ffi.ClearValue[]
 ---@field BufferImageCopyArray fun(count: number): vk.ffi.BufferImageCopy[]
@@ -87,6 +88,7 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field BufferArray fun(count: number): vk.ffi.Buffer[]
 ---@field DeviceSizeArray fun(count: number): vk.ffi.DeviceSize[]
 ---@field MemoryRequirementsArray fun(count: number): vk.ffi.MemoryRequirements[]
+---@field PhysicalDeviceFeaturesArray fun(count: number): vk.ffi.PhysicalDeviceFeatures[]
 local vk = {}
 for k, v in pairs(vkEnums) do
 	vk[k] = v
@@ -196,6 +198,7 @@ do
 	defType("Fence")
 	defType("Buffer")
 	defType("DeviceSize")
+	defType("PhysicalDeviceFeatures")
 end
 
 -- Constants
