@@ -20,6 +20,6 @@ Currently there is no documentation, as the api is quite similar, if not identic
 
 A few examples might give you the gist:
 
-`VkCreateInstance` -> `vk.createInstance`
-`VkCreateBuffer` -> `VkDevice:createBuffer`
-`VkQueueFlagBits.GRAPHICS_BIT` -> `vk.QueueFlagBits.GRAPHICS`
+`VkCreateInstance` -> `vk.createInstance`  
+`VkCreateBuffer` -> `VkDevice:createBuffer`  
+`VkQueueFlagBits(VK_QUEUE_GRAPHICS_BIT)` -> `vk.QueueFlagBits.GRAPHICS`
