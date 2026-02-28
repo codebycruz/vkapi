@@ -864,29 +864,21 @@ return function(vk)
 			imageMemoryBarrierCount, pImageMemoryBarriers)
 	end
 
+	---@param count number
 	---@param fences vk.ffi.Fence[]
 	---@param waitAll boolean
 	---@param timeout number
-	function VKDevice:waitForFences(fences, waitAll, timeout)
-		local count = #fences
-		local fenceArray = ffi.new("VkFence[?]", count)
-		for i = 1, count do
-			fenceArray[i - 1] = fences[i]
-		end
-		local result = self.v1_0.vkWaitForFences(self.handle, count, fenceArray, waitAll and 1 or 0, timeout)
+	function VKDevice:waitForFences(count, fences, waitAll, timeout)
+		local result = self.v1_0.vkWaitForFences(self.handle, count, fences, waitAll and 1 or 0, timeout)
 		if result ~= 0 then
 			error("Failed to wait for fences, error code: " .. tostring(result))
 		end
 	end
 
+	---@param count number
 	---@param fences vk.ffi.Fence[]
-	function VKDevice:resetFences(fences)
-		local count = #fences
-		local fenceArray = ffi.new("VkFence[?]", count)
-		for i = 1, count do
-			fenceArray[i - 1] = fences[i]
-		end
-		local result = self.v1_0.vkResetFences(self.handle, count, fenceArray)
+	function VKDevice:resetFences(count, fences)
+		local result = self.v1_0.vkResetFences(self.handle, count, fences)
 		if result ~= 0 then
 			error("Failed to reset fences, error code: " .. tostring(result))
 		end

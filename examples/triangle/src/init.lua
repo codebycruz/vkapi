@@ -413,12 +413,15 @@ vertexBuffers[0] = vertexBuffer
 local vertexBufferOffsets = vk.DeviceSizeArray(1)
 vertexBufferOffsets[0] = 0
 
+local fences = vk.FenceArray(1)
+fences[0] = inFlightFence
+
 local function draw()
 	-- Reuse previous command buffer for simplicity, but you'd want to double/triple buffer usually
 	device:resetCommandPool(commandPool)
 
-	device:waitForFences({ inFlightFence }, true, math.huge)
-	device:resetFences({ inFlightFence })
+	device:waitForFences(1, fences, true, math.huge)
+	device:resetFences(1, fences)
 
 	local imageIndex = device:acquireNextImageKHR(swapchain, -1, imageAvailableSemaphore, nil)
 	renderPassBeginInfo.framebuffer = framebuffers[imageIndex + 1]
