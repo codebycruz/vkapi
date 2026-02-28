@@ -77,6 +77,7 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field GraphicsPipelineCreateInfoArray fun(count: number): vk.ffi.GraphicsPipelineCreateInfo[]
 ---@field WriteDescriptorSetArray fun(count: number): vk.ffi.WriteDescriptorSet[]
 ---@field SubmitInfoArray fun(count: number): vk.ffi.SubmitInfo[]
+---@field CommandBufferArray fun(count: number): vk.ffi.CommandBuffer[]
 local vk = {}
 for k, v in pairs(vkEnums) do
 	vk[k] = v
@@ -179,6 +180,7 @@ do
 	defType("Viewport")
 	defType("Rect2D")
 	defType("BufferImageCopy")
+	defType("CommandBuffer")
 end
 
 -- Constants
