@@ -552,9 +552,9 @@ return function(vk)
 	---@param buffer vk.ffi.Buffer
 	---@return vk.ffi.MemoryRequirements
 	function VKDevice:getBufferMemoryRequirements(buffer)
-		local memRequirements = vk.MemoryRequirementsArray(1)
+		local memRequirements = vk.MemoryRequirements()
 		self.v1_0.vkGetBufferMemoryRequirements(self.handle, buffer, memRequirements)
-		return memRequirements[0]
+		return memRequirements
 	end
 
 	---@param image vk.ffi.Image

@@ -332,7 +332,7 @@ typedef struct {
 
 typedef struct {
   VkDeviceSize size;
-  uint32_t alignment;
+  VkDeviceSize alignment;
   uint32_t memoryTypeBits;
 } VkMemoryRequirements;
 
