@@ -147,8 +147,8 @@ vk.PolygonMode = {
 	POINT = 2,
 }
 
----@enum vk.CullModeFlags
-vk.CullModeFlags = {
+---@enum vk.CullModeFlagBits
+vk.CullModeFlagBits = {
 	NONE = 0,
 	FRONT = 0x00000001,
 	BACK = 0x00000002,

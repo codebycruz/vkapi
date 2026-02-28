@@ -128,7 +128,7 @@ return function(vk)
 	---@field depthClampEnable boolean?
 	---@field rasterizerDiscardEnable boolean?
 	---@field polygonMode vk.PolygonMode
-	---@field cullMode vk.CullModeFlags
+	---@field cullMode vk.CullModeFlagBits
 	---@field frontFace vk.FrontFace
 	---@field depthBiasEnable boolean?
 	---@field depthBiasConstantFactor number?

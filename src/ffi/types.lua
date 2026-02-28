@@ -211,7 +211,7 @@
 ---@field depthClampEnable number
 ---@field rasterizerDiscardEnable number
 ---@field polygonMode vk.PolygonMode
----@field cullMode vk.CullModeFlags
+---@field cullMode vk.CullModeFlagBits
 ---@field frontFace vk.FrontFace
 ---@field depthBiasEnable number
 ---@field depthBiasConstantFactor number
