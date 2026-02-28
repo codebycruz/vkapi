@@ -2,16 +2,6 @@ local vk = require("vkapi")
 local winit = require("winit")
 local ffi = require("ffi")
 
-ffi.cdef [[
-	typedef struct { long tv_sec; long tv_nsec; } timespec_t;
-	int clock_gettime(int, timespec_t*);
-]]
-local _ts = ffi.new("timespec_t")
-local function now()
-	ffi.C.clock_gettime(1, _ts) -- CLOCK_MONOTONIC = 1
-	return tonumber(_ts.tv_sec) + tonumber(_ts.tv_nsec) * 1e-9
-end
-
 local instance = vk.createInstance({
 	enabledExtensionNames = { "VK_KHR_surface", ffi.os == "Linux" and "VK_KHR_xlib_surface" or "VK_KHR_win32_surface" },
 	enabledLayerNames = { "VK_LAYER_KHRONOS_validation" },
@@ -444,9 +434,6 @@ for i = 1, fencesLen do
 	fences[i - 1] = inFlightFences[i]
 end
 
-local frameCount = 0
-local lastFpsTime = now()
-
 local currentFrame = 1
 local function draw()
 	local fence = inFlightFences[currentFrame]
@@ -488,15 +475,6 @@ local function draw()
 
 	device:queueSubmit(queue, 1, queueSubmits, fence)
 	device:queuePresentKHR(queue, swapchain, imageIndex, renderSemaphore)
-
-	frameCount = frameCount + 1
-	local t = now()
-	local elapsed = t - lastFpsTime
-	if elapsed >= 1.0 then
-		print(string.format("\rFPS: %.1f", frameCount / elapsed))
-		frameCount = 0
-		lastFpsTime = t
-	end
 end
 
 eventLoop:run(function(event, handler)
