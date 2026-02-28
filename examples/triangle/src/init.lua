@@ -186,14 +186,75 @@ do
 	})
 end
 
+local vertexBuffer = device:createBuffer({
+	size = 3 * ffi.sizeof("float") * 7, -- 3 vertices, each with 3 floats for position and 4 for color
+	usage = vk.BufferUsageFlagBits.VERTEX_BUFFER,
+})
+
+do
+	local memoryRequirements = device:getBufferMemoryRequirements(vertexBuffer)
+
+	local memoryTypeIndex = nil ---@type number?
+	local properties = vk.getPhysicalDeviceMemoryProperties(physicalDevice)
+	for i = 0, properties.memoryTypeCount - 1 do
+		local memType = properties.memoryTypes[i] ---@type vk.ffi.MemoryType
+		if bit.band(memoryRequirements.memoryTypeBits, bit.lshift(1, i)) ~= 0 and
+			bit.band(memType.propertyFlags, vk.MemoryPropertyFlagBits.HOST_VISIBLE) ~= 0 and
+			bit.band(memType.propertyFlags, vk.MemoryPropertyFlagBits.HOST_COHERENT) ~= 0
+		then
+			memoryTypeIndex = i
+			break
+		end
+	end
+
+	local memoryChunk = device:allocateMemory({
+		allocationSize = memoryRequirements.size,
+		memoryTypeIndex = assert(memoryTypeIndex, "No suitable memory type found for vertex buffer")
+	})
+
+	device:bindBufferMemory(vertexBuffer, memoryChunk, 0)
+end
+
+local indexBuffer = device:createBuffer({
+	size = 3 * ffi.sizeof("uint16_t"),
+	usage = vk.BufferUsageFlagBits.INDEX_BUFFER,
+})
+
+
+do
+	local memoryRequirements = device:getBufferMemoryRequirements(indexBuffer)
+
+	local memoryTypeIndex = nil ---@type number?
+	local properties = vk.getPhysicalDeviceMemoryProperties(physicalDevice)
+	for i = 0, properties.memoryTypeCount - 1 do
+		local memType = properties.memoryTypes[i] ---@type vk.ffi.MemoryType
+		if bit.band(memoryRequirements.memoryTypeBits, bit.lshift(1, i)) ~= 0 and
+			bit.band(memType.propertyFlags, vk.MemoryPropertyFlagBits.HOST_VISIBLE) ~= 0 and
+			bit.band(memType.propertyFlags, vk.MemoryPropertyFlagBits.HOST_COHERENT) ~= 0
+		then
+			memoryTypeIndex = i
+			break
+		end
+	end
+
+	local memoryChunk = device:allocateMemory({
+		allocationSize = memoryRequirements.size,
+		memoryTypeIndex = assert(memoryTypeIndex, "No suitable memory type found for index buffer")
+	})
+
+	device:bindBufferMemory(indexBuffer, memoryChunk, 0)
+end
+
 local pipeline = device:createGraphicsPipelines(nil, { {
 	renderPass = renderPass,
+
 	rasterizationState = {
 		polygonMode = vk.PolygonMode.FILL,
 		cullMode = vk.CullModeFlagBits.BACK,
 		frontFace = vk.FrontFace.CLOCKWISE,
 		lineWidth = 1.0,
 	},
+
 	multisampleState = {
 		rasterizationSamples = vk.SampleCountFlagBits.COUNT_1,
 	},
@@ -327,6 +388,12 @@ do
 	})
 end
 
+local vertexBuffers = vk.BufferArray(1)
+vertexBuffers[0] = vertexBuffer
+
+local vertexBufferOffsets = vk.DeviceSizeArray(1)
+vertexBufferOffsets[0] = 0
+
 local function draw()
 	-- Reuse previous command buffer for simplicity, but you'd want to double/triple buffer usually
 	device:resetCommandPool(commandPool)
@@ -342,6 +409,10 @@ local function draw()
 	device:cmdSetScissor(commandBuffer, 0, 1, scissors)
 	device:cmdSetViewport(commandBuffer, 0, 1, viewports)
 	device:cmdBeginRenderPass(commandBuffer, renderPassBeginInfo, vk.SubpassContents.INLINE)
+	device:cmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexBufferOffsets)
+	device:cmdBindIndexBuffer(commandBuffer, indexBuffer, 0, vk.IndexType.UINT16)
+	device:cmdBindPipeline(commandBuffer, vk.PipelineBindPoint.GRAPHICS, pipeline)
+	device:cmdDraw(commandBuffer, 3, 1, 0, 0)
 	device:cmdEndRenderPass(commandBuffer)
 	device:endCommandBuffer(commandBuffer)
 
