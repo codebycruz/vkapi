@@ -40,50 +40,12 @@ return function(vk)
 		return shaderModule[0]
 	end
 
-	---@class vk.PushConstantRange
-	---@field stageFlags vk.ShaderStageFlagBits
-	---@field offset number
-	---@field size number
-
-	---@class vk.PipelineLayoutCreateInfo
-	---@field descriptorSetLayouts vk.ffi.DescriptorSetLayout[]?
-	---@field pushConstantRanges vk.PushConstantRange[]?
-
-	---@param info vk.PipelineLayoutCreateInfo
-	---@return ffi.cdata* VkPipelineLayoutCreateInfo
-	local function pipelineLayoutCreateInfoToFFI(info)
-		local createInfo = vk.PipelineLayoutCreateInfo()
-
-		local layouts = info.descriptorSetLayouts
-		if layouts and #layouts > 0 then
-			local layoutArray = ffi.new("VkDescriptorSetLayout[?]", #layouts)
-			for i, l in ipairs(layouts) do
-				layoutArray[i - 1] = l
-			end
-			createInfo.setLayoutCount = #layouts
-			createInfo.pSetLayouts = layoutArray
-		end
-
-		local ranges = info.pushConstantRanges
-		if ranges and #ranges > 0 then
-			local rangeArray = vk.PushConstantRangeArray(#ranges)
-			for i, r in ipairs(ranges) do
-				rangeArray[i - 1].stageFlags = r.stageFlags
-				rangeArray[i - 1].offset = r.offset
-				rangeArray[i - 1].size = r.size
-			end
-			createInfo.pushConstantRangeCount = #ranges
-			createInfo.pPushConstantRanges = rangeArray
-		end
-
-		return createInfo
-	end
-
-	---@param info vk.PipelineLayoutCreateInfo
+	---@param info vk.ffi.PipelineLayoutCreateInfo
 	---@param allocator ffi.cdata*?
 	---@return vk.ffi.PipelineLayout
 	function VKDevice:createPipelineLayout(info, allocator)
-		local createInfo = pipelineLayoutCreateInfoToFFI(info)
+		local createInfo = vk.PipelineLayoutCreateInfo(info)
+
 		local pipelineLayout = ffi.new("VkPipelineLayout[1]")
 		local result = self.v1_0.vkCreatePipelineLayout(self.handle, createInfo, allocator, pipelineLayout)
 		if result ~= 0 then
@@ -744,14 +706,10 @@ return function(vk)
 		return sets
 	end
 
+	---@param count number
 	---@param writes vk.ffi.WriteDescriptorSet[]
-	function VKDevice:updateDescriptorSets(writes)
-		local count = #writes
-		local writeArray = vk.WriteDescriptorSetArray(count)
-		for i, write in ipairs(writes) do
-			writeArray[i - 1] = vk.WriteDescriptorSet(write)
-		end
-		self.v1_0.vkUpdateDescriptorSets(self.handle, count, writeArray, 0, nil)
+	function VKDevice:updateDescriptorSets(count, writes)
+		self.v1_0.vkUpdateDescriptorSets(self.handle, count, writes, 0, nil)
 	end
 
 	---@param info vk.ffi.CommandBufferAllocateInfo
@@ -1076,7 +1034,7 @@ return function(vk)
 	---@field vkCreateBuffer fun(device: vk.ffi.Device, info: ffi.cdata*, allocator: ffi.cdata*?, buffer: ffi.cdata*): vk.ffi.Result
 	---@field vkDestroyBuffer fun(device: vk.ffi.Device, buffer: vk.ffi.Buffer, allocator: ffi.cdata*?)
 	---@field vkCreateShaderModule fun(device: vk.ffi.Device, info: ffi.cdata*, allocator: ffi.cdata*?, shaderModule: ffi.cdata*): vk.ffi.Result
-	---@field vkCreatePipelineLayout fun(device: vk.ffi.Device, info: ffi.cdata*, allocator: ffi.cdata*?, pipelineLayout: ffi.cdata*): vk.ffi.Result
+	---@field vkCreatePipelineLayout fun(device: vk.ffi.Device, info: vk.ffi.PipelineLayoutCreateInfo, allocator: ffi.cdata*?, pipelineLayout: ffi.cdata*): vk.ffi.Result
 	---@field vkCreateGraphicsPipelines fun(device: vk.ffi.Device, pipelineCache: vk.ffi.PipelineCache, count: number, infos: ffi.cdata*, allocator: ffi.cdata*?, pipelines: ffi.cdata*): vk.ffi.Result
 	---@field vkCreateRenderPass fun(device: vk.ffi.Device, info: ffi.cdata*, allocator: ffi.cdata*?, renderPass: ffi.cdata*): vk.ffi.Result
 	---@field vkCreateImageView fun(device: vk.ffi.Device, info: ffi.cdata*, allocator: ffi.cdata*?, imageView: ffi.cdata*): vk.ffi.Result
