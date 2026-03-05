@@ -145,9 +145,9 @@
 
 ---@class vk.ffi.PipelineLayoutCreateInfo: vk.ffi.BaseStruct
 ---@field setLayoutCount number?
----@field pSetLayouts ffi.cdata*?
+---@field pSetLayouts vk.ffi.DescriptorSetLayout[]?
 ---@field pushConstantRangeCount number?
----@field pPushConstantRanges vk.ffi.PushConstantRange?
+---@field pPushConstantRanges vk.ffi.PushConstantRange[]?
 
 ---@class vk.ffi.SpecializationInfo: ffi.cdata*
 ---@field mapEntryCount number
@@ -357,18 +357,18 @@
 ---@field pBindings vk.ffi.DescriptorSetLayoutBinding[]?
 
 ---@class vk.ffi.DescriptorPoolSize: ffi.cdata*
----@field type number
+---@field type vk.DescriptorType
 ---@field descriptorCount number
 
 ---@class vk.ffi.DescriptorPoolCreateInfo: vk.ffi.BaseStruct
 ---@field maxSets number
 ---@field poolSizeCount number?
----@field pPoolSizes ffi.cdata*?
+---@field pPoolSizes vk.ffi.DescriptorPoolSize[]?
 
 ---@class vk.ffi.DescriptorSetAllocateInfo: vk.ffi.BaseStruct
 ---@field descriptorPool vk.ffi.DescriptorPool
 ---@field descriptorSetCount number
----@field pSetLayouts ffi.cdata*
+---@field pSetLayouts vk.ffi.DescriptorSetLayout[]?
 
 ---@class vk.ffi.DescriptorBufferInfo: ffi.cdata*
 ---@field buffer vk.ffi.Buffer

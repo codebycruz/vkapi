@@ -92,6 +92,7 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field DescriptorSetLayoutArray fun(count: number): vk.ffi.DescriptorSetLayout[]
 ---@field DescriptorSetLayoutBindingArray fun(count: number): vk.ffi.DescriptorSetLayoutBinding[]
 ---@field DescriptorSetArray fun(count: number): vk.ffi.DescriptorSet[]
+---@field DescriptorPoolSizeArray fun(count: number): vk.ffi.DescriptorPoolSize[]
 local vk = {}
 for k, v in pairs(vkEnums) do
 	vk[k] = v
@@ -205,6 +206,7 @@ do
 	defType("DescriptorSetLayout")
 	defType("DescriptorSetLayoutBinding")
 	defType("DescriptorSet")
+	defType("DescriptorPoolSize")
 end
 
 -- Constants
