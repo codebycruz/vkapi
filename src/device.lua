@@ -319,9 +319,11 @@ return function(vk)
 	---@return vk.ffi.Pipeline
 	function VKDevice:createComputePipeline(pipelineCache, info, allocator)
 		local createInfo = vk.ComputePipelineCreateInfo()
-		createInfo.stage.stage = info.stage.stage
-		createInfo.stage.module = info.stage.module
-		createInfo.stage.pName = info.stage.name or "main"
+		local stage = vk.PipelineShaderStageCreateInfo()
+		stage.stage = info.stage.stage
+		stage.module = info.stage.module
+		stage.pName = info.stage.name or "main"
+		ffi.copy(createInfo.stage, stage, ffi.sizeof(stage))
 		createInfo.layout = info.layout
 
 		local pipeline = ffi.new("VkPipeline[1]")
