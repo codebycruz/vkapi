@@ -579,6 +579,18 @@ return function(vk)
 		self.v1_0.vkDestroyImageView(self.handle, imageView, allocator)
 	end
 
+	---@param image vk.ffi.Image
+	---@param allocator ffi.cdata*?
+	function VKDevice:destroyImage(image, allocator)
+		self.v1_0.vkDestroyImage(self.handle, image, allocator)
+	end
+
+	---@param renderPass vk.ffi.RenderPass
+	---@param allocator ffi.cdata*?
+	function VKDevice:destroyRenderPass(renderPass, allocator)
+		self.v1_0.vkDestroyRenderPass(self.handle, renderPass, allocator)
+	end
+
 	---@param framebuffer vk.ffi.Framebuffer
 	---@param allocator ffi.cdata*?
 	function VKDevice:destroyFramebuffer(framebuffer, allocator)
@@ -1172,6 +1184,7 @@ return function(vk)
 			vkCmdPipelineBarrier = "void(*)(VkCommandBuffer, VkFlags, VkFlags, VkFlags, uint32_t, const void*, uint32_t, const void*, uint32_t, const VkImageMemoryBarrier*)",
 			vkCreateComputePipelines = "VkResult(*)(VkDevice, uint64_t, uint32_t, const VkComputePipelineCreateInfo*, const VkAllocationCallbacks*, VkPipeline*)",
 			vkCmdDispatch = "void(*)(VkCommandBuffer, uint32_t, uint32_t, uint32_t)",
+			vkDestroyRenderPass = "void(*)(VkDevice, VkRenderPass, const VkAllocationCallbacks*)",
 		}
 
 		---@type vk.Device.Fns
