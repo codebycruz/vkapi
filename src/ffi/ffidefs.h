@@ -1185,6 +1185,10 @@ VkResult vkCreateComputePipelines(
 void vkCmdDispatch(VkCommandBuffer commandBuffer, uint32_t groupCountX,
                    uint32_t groupCountY, uint32_t groupCountZ);
 
+void vkCmdPushConstants(VkCommandBuffer commandBuffer, VkPipelineLayout layout,
+                        VkShaderStageFlags stageFlags, uint32_t offset,
+                        uint32_t size, const void *pValues);
+
 void vkCmdPipelineBarrier(VkCommandBuffer commandBuffer, VkFlags srcStageMask,
                           VkFlags dstStageMask, VkFlags dependencyFlags,
                           uint32_t memoryBarrierCount,

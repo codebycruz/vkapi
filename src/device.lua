@@ -907,6 +907,16 @@ return function(vk)
 		self.v1_0.vkCmdDrawIndexed(commandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance)
 	end
 
+	---@param commandBuffer vk.ffi.CommandBuffer
+	---@param layout vk.ffi.PipelineLayout
+	---@param stageFlags vk.ShaderStageFlagBits
+	---@param offset number
+	---@param size number
+	---@param pValues ffi.cdata*
+	function VKDevice:cmdPushConstants(commandBuffer, layout, stageFlags, offset, size, pValues)
+		self.v1_0.vkCmdPushConstants(commandBuffer, layout, stageFlags, offset, size, pValues)
+	end
+
 	---@param queue vk.ffi.Queue
 	---@param count number
 	---@param submits vk.ffi.SubmitInfo[]
@@ -1094,6 +1104,7 @@ return function(vk)
 	---@field vkQueuePresentKHR fun(queue: vk.ffi.Queue, info: vk.ffi.PresentInfoKHR): vk.ffi.Result
 	---@field vkCreateSampler fun(device: vk.ffi.Device, info: ffi.cdata*, allocator: ffi.cdata*?, sampler: ffi.cdata*): vk.ffi.Result
 	---@field vkDestroySampler fun(device: vk.ffi.Device, sampler: vk.ffi.Sampler, allocator: ffi.cdata*?)
+	---@field vkCmdPushConstants fun(commandBuffer: vk.ffi.CommandBuffer, layout: vk.ffi.PipelineLayout, stageFlags: number, offset: number, size: number, pValues: ffi.cdata*)
 	---@field vkCmdPipelineBarrier fun(commandBuffer: vk.ffi.CommandBuffer, srcStageMask: number, dstStageMask: number, dependencyFlags: number, memoryBarrierCount: number, pMemoryBarriers: ffi.cdata*?, bufferMemoryBarrierCount: number, pBufferMemoryBarriers: ffi.cdata*?, imageMemoryBarrierCount: number, pImageMemoryBarriers: ffi.cdata*?)
 	---@field vkCreateComputePipelines fun(device: vk.ffi.Device, pipelineCache: number, count: number, infos: ffi.cdata*, allocator: ffi.cdata*?, pipelines: ffi.cdata*): vk.ffi.Result
 	---@field vkCmdDispatch fun(commandBuffer: vk.ffi.CommandBuffer, groupCountX: number, groupCountY: number, groupCountZ: number)
@@ -1184,6 +1195,7 @@ return function(vk)
 			vkCmdPipelineBarrier = "void(*)(VkCommandBuffer, VkFlags, VkFlags, VkFlags, uint32_t, const void*, uint32_t, const void*, uint32_t, const VkImageMemoryBarrier*)",
 			vkCreateComputePipelines = "VkResult(*)(VkDevice, uint64_t, uint32_t, const VkComputePipelineCreateInfo*, const VkAllocationCallbacks*, VkPipeline*)",
 			vkCmdDispatch = "void(*)(VkCommandBuffer, uint32_t, uint32_t, uint32_t)",
+			vkCmdPushConstants = "void(*)(VkCommandBuffer, VkPipelineLayout, VkShaderStageFlags, uint32_t, uint32_t, const void*)",
 			vkDestroyRenderPass = "void(*)(VkDevice, VkRenderPass, const VkAllocationCallbacks*)",
 		}
 
