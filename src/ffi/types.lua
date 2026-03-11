@@ -337,7 +337,7 @@
 ---@field layers number
 
 ---@class vk.ffi.CommandPoolCreateInfo: vk.ffi.BaseStruct
----@field flags number?
+---@field flags vk.CommandPoolCreateFlagBits?
 ---@field queueFamilyIndex number
 
 ---@class vk.ffi.CommandBufferAllocateInfo: vk.ffi.BaseStruct
