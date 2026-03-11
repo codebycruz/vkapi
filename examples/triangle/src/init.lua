@@ -438,11 +438,14 @@ for i = 1, fencesLen do
 	fences[i - 1] = inFlightFences[i]
 end
 
+-- Track which semaphore was used to acquire each swapchain image
+local imageAcquireSemaphoreForImage = {}
+local waitSemaphoreForSubmit = vk.SemaphoreArray(1)
+
 local currentFrame = 1
 local function draw()
-	local fence = inFlightFences[currentFrame]
 	local imgSemaphore = imageAvailableSemaphores[currentFrame]
-	local renderSemaphore = renderFinishedSemaphores[currentFrame]
+	local fence = inFlightFences[currentFrame]
 
 	local pool = commandPools[currentFrame]
 	local commandBuffer = commandBuffers[currentFrame]
@@ -456,13 +459,22 @@ local function draw()
 
 	commandBuffersToSubmit[0] = commandBuffer
 
+	-- Acquire the next image using the current frame's semaphore
+	local imageIndex = device:acquireNextImageKHR(swapchain, -1, imgSemaphore, nil)
+
+	-- Track which semaphore was used for this image
+	imageAcquireSemaphoreForImage[imageIndex + 1] = imgSemaphore
+
+	local renderSemaphore = renderFinishedSemaphores[imageIndex + 1]
+
+	-- Wait on the semaphore that was used to acquire this specific image
+	waitSemaphoreForSubmit[0] = imageAcquireSemaphoreForImage[imageIndex + 1]
 	queueSubmits[0].waitSemaphoreCount = 1
-	queueSubmits[0].pWaitSemaphores = waitSemaphores + frameOffset
+	queueSubmits[0].pWaitSemaphores = waitSemaphoreForSubmit
 
 	queueSubmits[0].signalSemaphoreCount = 1
-	queueSubmits[0].pSignalSemaphores = signalSemaphores + frameOffset
+	queueSubmits[0].pSignalSemaphores = signalSemaphores + imageIndex
 
-	local imageIndex = device:acquireNextImageKHR(swapchain, -1, imgSemaphore, nil)
 	renderPassBeginInfo.framebuffer = framebuffers[imageIndex + 1]
 	imageIndices[0] = imageIndex
 
