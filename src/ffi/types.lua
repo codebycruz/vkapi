@@ -408,6 +408,7 @@
 ---@field oldSwapchain vk.ffi.SwapchainKHR
 
 ---@class vk.ffi.CommandBufferBeginInfo: vk.ffi.BaseStruct
+---@field flags vk.CommandBufferUsageFlagBits?
 ---@field pInheritanceInfo ffi.cdata*?
 
 ---@class vk.ffi.RenderPassBeginInfo: vk.ffi.BaseStruct

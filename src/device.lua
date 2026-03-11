@@ -751,12 +751,10 @@ return function(vk)
 		return commandBufferList
 	end
 
-	local nullBeginInfo = vk.CommandBufferBeginInfo()
-
 	---@param commandBuffer vk.ffi.CommandBuffer
-	---@param info vk.ffi.CommandBufferBeginInfo?
+	---@param info vk.ffi.CommandBufferBeginInfo
 	function VKDevice:beginCommandBuffer(commandBuffer, info)
-		local result = self.v1_0.vkBeginCommandBuffer(commandBuffer, info or nullBeginInfo)
+		local result = self.v1_0.vkBeginCommandBuffer(commandBuffer, info)
 		if result ~= 0 then
 			error("Failed to begin Vulkan command buffer, error code: " .. tostring(result))
 		end
