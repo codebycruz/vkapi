@@ -3,6 +3,7 @@ local winit = require("winit")
 local ffi = require("ffi")
 
 local desiredFormat = vk.Format.B8G8R8A8_SRGB
+local pathSep = package.config:sub(1, 1)
 
 local instance = vk.createInstance({
 	enabledExtensionNames = { "VK_KHR_surface", ffi.os == "Linux" and "VK_KHR_xlib_surface" or "VK_KHR_win32_surface" },
@@ -174,12 +175,13 @@ end
 
 local pipelineLayout = device:createPipelineLayout({})
 
-local targetFolder = debug.getinfo(1, "S").source:sub(2):match("(.*/)") or "./"
-local projectFolder = targetFolder .. "../../"
+local sourcePath = debug.getinfo(1, "S").source:sub(2):gsub("^@", "")
+local targetFolder = sourcePath:match("(.*[/\\])") or ("." .. pathSep)
+local projectFolder = targetFolder .. ".." .. pathSep .. ".." .. pathSep
 
 local vertexModule ---@type vk.ffi.ShaderModule
 do
-	local code = io.open(projectFolder .. "shaders/triangle.vert.spv", "rb"):read("*a")
+	local code = io.open(projectFolder .. "shaders" .. pathSep .. "triangle.vert.spv", "rb"):read("*a")
 	vertexModule = device:createShaderModule({
 		codeSize = #code,
 		pCode = ffi.cast("const uint32_t*", code),
@@ -188,7 +190,7 @@ end
 
 local fragmentModule ---@type vk.ffi.ShaderModule
 do
-	local code = io.open(projectFolder .. "shaders/triangle.frag.spv", "rb"):read("*a")
+	local code = io.open(projectFolder .. "shaders" .. pathSep .. "triangle.frag.spv", "rb"):read("*a")
 	fragmentModule = device:createShaderModule({
 		codeSize = #code,
 		pCode = ffi.cast("const uint32_t*", code),
