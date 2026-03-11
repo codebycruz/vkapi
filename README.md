@@ -6,7 +6,7 @@ Cross-platform low level Vulkan bindings for LuaJIT.
 
 | Arch        | Windows | Linux | macOS |
 | ----------- | ------- | ----- | ----- |
-| x86-64      | ❓      | ✅    | ❌    |
+| x86-64      | ✅      | ✅    | ❌    |
 
 ## Installation
 
