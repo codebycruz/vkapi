@@ -7,7 +7,7 @@ local pathSep = package.config:sub(1, 1)
 
 local instance = vk.createInstance({
 	enabledExtensionNames = { "VK_KHR_surface", ffi.os == "Linux" and "VK_KHR_xlib_surface" or "VK_KHR_win32_surface" },
-	enabledLayerNames = { "VK_LAYER_KHRONOS_validation" },
+	enabledLayerNames = {},
 	applicationInfo = {
 		name = "triangle test",
 		version = 1.0,
@@ -103,7 +103,7 @@ local renderPass = device:createRenderPass({
 
 local swapchain = device:createSwapchainKHR({
 	surface = surface,
-	minImageCount = 2,
+	minImageCount = 3,
 	imageFormat = desiredFormat,
 	imageColorSpace = vk.ColorSpaceKHR.SRGB_NONLINEAR,
 	imageExtent = { width = window.width, height = window.height },
@@ -159,11 +159,16 @@ for i, image in ipairs(swapchainImages) do
 	framebuffers[i] = framebuffer
 end
 
+---@type vk.ffi.CommandPool[]
 local commandPools = {}
+
+---@type vk.ffi.CommandBuffer[]
 local commandBuffers = {}
+
 for i = 1, #swapchainImages do
 	commandPools[i] = device:createCommandPool({
 		queueFamilyIndex = queueFamilyIdx,
+		flags = vk.CommandPoolCreateFlagBits.RESET_COMMAND_BUFFER
 	})
 
 	commandBuffers[i] = device:allocateCommandBuffers({
@@ -441,13 +446,15 @@ end
 -- Track which semaphore was used to acquire each swapchain image
 local imageAcquireSemaphoreForImage = {}
 local waitSemaphoreForSubmit = vk.SemaphoreArray(1)
+local beginInfo = vk.CommandBufferBeginInfo({
+	flags = vk.CommandBufferUsageFlagBits.SIMULTANEOUS_USE
+})
 
 local currentFrame = 1
 local function draw()
 	local imgSemaphore = imageAvailableSemaphores[currentFrame]
 	local fence = inFlightFences[currentFrame]
 
-	local pool = commandPools[currentFrame]
 	local commandBuffer = commandBuffers[currentFrame]
 
 	local frameOffset = currentFrame - 1
@@ -455,7 +462,7 @@ local function draw()
 
 	device:waitForFences(1, fences + frameOffset, true, math.huge)
 	device:resetFences(1, fences + frameOffset)
-	device:resetCommandPool(pool)
+	device:resetCommandBuffer(commandBuffer)
 
 	commandBuffersToSubmit[0] = commandBuffer
 
@@ -478,7 +485,7 @@ local function draw()
 	renderPassBeginInfo.framebuffer = framebuffers[imageIndex + 1]
 	imageIndices[0] = imageIndex
 
-	device:beginCommandBuffer(commandBuffer)
+	device:beginCommandBuffer(commandBuffer, beginInfo)
 	device:cmdSetScissor(commandBuffer, 0, 1, scissors)
 	device:cmdSetViewport(commandBuffer, 0, 1, viewports)
 	device:cmdBeginRenderPass(commandBuffer, renderPassBeginInfo, vk.SubpassContents.INLINE)
