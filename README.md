@@ -2,6 +2,12 @@
 
 Cross-platform low level Vulkan bindings for LuaJIT.
 
+## Support
+
+| Arch        | Windows | Linux | macOS |
+| ----------- | ------- | ----- | ----- |
+| x86-64      | ❓      | ✅    | ❌    |
+
 ## Installation
 
 This is intended to be used with the [lpm package manager](https://github.com/codebycruz/lpm)
