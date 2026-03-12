@@ -73,6 +73,7 @@ local vkEnums = require("vkapi.ffi.enums")
 ---@field ImageMemoryBarrierArray fun(count: number): vk.ffi.ImageMemoryBarrier[]
 ---@field ClearValueArray fun(count: number): vk.ffi.ClearValue[]
 ---@field BufferImageCopyArray fun(count: number): vk.ffi.BufferImageCopy[]
+---@field BufferCopyArray fun(count: number): vk.ffi.BufferCopy[]
 ---@field DeviceQueueCreateInfoArray fun(count: number): vk.ffi.DeviceQueueCreateInfo[]
 ---@field PipelineShaderStageCreateInfoArray fun(count: number): vk.ffi.PipelineShaderStageCreateInfo[]
 ---@field GraphicsPipelineCreateInfoArray fun(count: number): vk.ffi.GraphicsPipelineCreateInfo[]
@@ -197,6 +198,7 @@ do
 	defType("Viewport")
 	defType("Rect2D")
 	defType("BufferImageCopy")
+	defType("BufferCopy")
 	defType("CommandBuffer")
 	defType("ImageView")
 	defType("SwapchainKHR")

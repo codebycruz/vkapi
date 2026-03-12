@@ -547,6 +547,11 @@
 ---@field imageOffset vk.ffi.Offset3D
 ---@field imageExtent vk.ffi.Extent3D
 
+---@class vk.ffi.BufferCopy: ffi.cdata*
+---@field srcOffset vk.ffi.DeviceSize
+---@field dstOffset vk.ffi.DeviceSize
+---@field size vk.ffi.DeviceSize
+
 ---@class vk.ffi.PhysicalDeviceFeatures: ffi.cdata*
 ---@field robustBufferAccess number
 ---@field fullDrawIndexUint32 number
